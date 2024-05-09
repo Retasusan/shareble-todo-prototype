@@ -1,0 +1,74 @@
+.top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.NewLine {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.List {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.List > li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.List > li.disabled {
+    background-color: #ddd;
+}
+.List > li.disabled > div > span:not(:first-child):not(button) {
+    opacity: 0.5;
+}
+.List > li > div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: row;
+}
+.List > li > div > span {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.RemoveButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    font-size: 1.2rem;
+    color: #fff;
+    background-color: #e83521;
+    border: 1px solid #e83521;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all ease-out 0.1s;
+}
