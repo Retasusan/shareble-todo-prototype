@@ -16,7 +16,8 @@ export default function TodoList() {
     }]);
     const [newTodo, setNewTodo] = useState<string>("");
     const [newPriority, setNewPriority] = useState<string>("普通");
-    const [filter, setFilter] = useState<string>("全部");
+    const [progressFilter, setProgressFilter] = useState<string>("全部");
+    const [priorityFilter, setPriorityFilter] = useState<string>("全部");
 
     const addTodoHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -53,10 +54,16 @@ export default function TodoList() {
     }, [todos]);
 
     const filteredTodos = todos.filter(todo => {
-        if (filter === '全部') return true;
-        if (filter === '完了') return todo.isDone;
-        if (filter === '未完了') return !todo.isDone;
-        return todo.priority === filter;
+        // 進捗状況の条件を満たすかどうか
+        const progressCondition = progressFilter === '全部' || 
+            (progressFilter === "完了" && todo.isDone) ||
+            (progressFilter === "未完了" && !todo.isDone);
+
+        // 優先度の条件を満たす
+        const priorityCondition = priorityFilter === '全部' || priorityFilter === todo.priority;
+
+        // 両方の条件を満たしているならリストに表示する
+        return progressCondition && priorityCondition;
     });
 
     return (
@@ -71,7 +78,7 @@ export default function TodoList() {
                 <button onClick={addTodoHandler} disabled={!newTodo}>追加</button>
             </div>
             <div className={styles.border}>
-                <select className={styles.limit} id="limit" value={filter} onChange={e => setFilter(e.target.value)}>
+                <select className={styles.limit} id="limit" value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
                     <option value="全部">全部</option>
                     <option value="至急">至急</option>
                     <option value="普通">普通</option>
@@ -79,9 +86,9 @@ export default function TodoList() {
                 </select>
             </div>
             <div>
-                <button className={filter ==='全部' ? styles.selected : styles.button} onClick={() => setFilter('全部')}>全部</button>
-                <button className={filter ==='完了' ? styles.selected : styles.button}onClick={() => setFilter('完了')}>完了</button>
-                <button className={filter ==='未完了' ? styles.selected : styles.button}onClick={() => setFilter('未完了')}>未完了</button>
+                <button className={progressFilter ==='全部' ? styles.selected : styles.button} onClick={() => setProgressFilter('全部')}>全部</button>
+                <button className={progressFilter ==='完了' ? styles.selected : styles.button}onClick={() => setProgressFilter('完了')}>完了</button>
+                <button className={progressFilter ==='未完了' ? styles.selected : styles.button}onClick={() => setProgressFilter('未完了')}>未完了</button>
             </div>
             <ul className={styles.List}>
                 {filteredTodos.map((todo, index) => todo.id !== "null" ? (
