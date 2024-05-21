@@ -7,12 +7,16 @@ export default function TodoList() {
         id: string;
         isDone: boolean;
         text: string;
+        priority: string;
     }[]>([{
         id: "null",
         isDone: false,
         text: "サンプルタスク",
+        priority: "普通",
     }]);
     const [newTodo, setNewTodo] = useState<string>("");
+    const [newPriority, setNewPriority] = useState<string>("普通");
+    const [filter, setFilter] = useState<string>("全部");
 
     const addTodoHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -22,52 +26,82 @@ export default function TodoList() {
             id: new Date().getTime().toString(),
             isDone: false,
             text: newTodo,
+            priority: newPriority,
         }]);
         setNewTodo("");
     }
 
     useEffect(() => {
-        const todos = localStorage.getItem("todolist");
-        if (todos && todos.length > 0) {
-            setTodos(JSON.parse(todos).todos);
+        const savedTodos = localStorage.getItem("todolist");
+        if (savedTodos && savedTodos.length > 0) {
+            setTodos(JSON.parse(savedTodos));
         }
     }, []);
 
     useEffect(() => {
         if (todos.length > 0 && todos[0].id === "null") {
-            const todos = localStorage.getItem("todolist");
-            if (todos && todos.length > 0) {
-                setTodos(JSON.parse(todos).todos);
+            const savedTodos = localStorage.getItem("todolist");
+            if (savedTodos && savedTodos.length > 0) {
+                setTodos(JSON.parse(savedTodos));
                 return;
             }
             setTodos([]);
             return;
         }
 
-        localStorage.setItem("todolist", JSON.stringify({
-            todos: todos,
-            last_updated: new Date().getTime(),
-        }));
+        localStorage.setItem("todolist", JSON.stringify(todos));
     }, [todos]);
+
+    const filteredTodos = todos.filter(todo => {
+        if (filter === '全部') return true;
+        if (filter === '完了') return todo.isDone;
+        if (filter === '未完了') return !todo.isDone;
+        return todo.priority === filter;
+    });
 
     return (
         <div className={styles.top}>
             <div className={styles.NewLine}>
                 <input type="text" value={newTodo} onChange={e => setNewTodo(e.target.value)} />
-                <button onClick={addTodoHandler} disabled={!newTodo} >追加</button>
+                <select id="classification" value={newPriority} onChange={e => setNewPriority(e.target.value)}>
+                    <option value="至急">至急</option>
+                    <option value="普通">普通</option>
+                    <option value="些事">些事</option>
+                </select>
+                <button onClick={addTodoHandler} disabled={!newTodo}>追加</button>
+            </div>
+            <div className={styles.border}>
+                <select className={styles.limit} id="limit" value={filter} onChange={e => setFilter(e.target.value)}>
+                    <option value="全部">全部</option>
+                    <option value="至急">至急</option>
+                    <option value="普通">普通</option>
+                    <option value="些事">些事</option>
+                </select>
+            </div>
+            <div>
+                <button className={filter ==='全部' ? styles.selected : styles.button} onClick={() => setFilter('全部')}>全部</button>
+                <button className={filter ==='完了' ? styles.selected : styles.button}onClick={() => setFilter('完了')}>完了</button>
+                <button className={filter ==='未完了' ? styles.selected : styles.button}onClick={() => setFilter('未完了')}>未完了</button>
             </div>
             <ul className={styles.List}>
-                {todos.map((todo, index) => todo.id !== "null"? (
-                    <li key={todo.id} className={todos[index].isDone ? styles.disabled : ''}>
+                {filteredTodos.map((todo, index) => todo.id !== "null" ? (
+                    <li key={todo.id} className={todo.isDone ? styles.disabled : ''}>
                         <div>
                             <span>
-                                <input type="checkbox" checked={todos[index].isDone} onChange={e => {
+                                
+                                <input type="checkbox" checked={todo.isDone} onChange={e => {
+                                    // todosの中身を展開してnewTodosの中に格納している
                                     const newTodos = [...todos];
-                                    newTodos[index].isDone = e.target.checked;
+                                    // newTodosの中からtodo.idに一致する最初の要素を引き出しclickTodoの中に格納している
+                                    const clickedTodo = newTodos.find(x => x.id === todo.id);
+                                    // もしclickTodoが定義されていなかったらclickTodoのisDoneプロパティはeのdomのcheckedになる？
+                                    if(clickedTodo !== undefined) clickedTodo.isDone = e.target.checked;
+                                    // Todosの中にnewTodosを格納する
                                     setTodos(newTodos);
                                 }} />
                             </span>
-                            <span>{index + 1}. </span>
+                            <span>{index + 1}.</span>
+                            <span>{todo.priority}</span>
                             <span>{todo.text}</span>
                         </div>
                         <div>

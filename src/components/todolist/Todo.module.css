@@ -6,6 +6,7 @@
     margin: 0;
     width: 100%;
     padding: 0 20px;
+    display: flex;
 }
 
 .NewLine {
@@ -71,4 +72,25 @@
     border-radius: 10px;
     cursor: pointer;
     transition: all ease-out 0.1s;
+}
+.priority{
+    color: purple;
+}
+
+.limit{
+    width: 150px;
+    height: 40px;
+    font-size: 30px;
+}
+
+.border{
+    margin:0 auto 10px 20px;
+}
+
+.button{
+    background-color:　gray;
+}
+.selected{
+    background-color: purple;
+    color:white;
 }
