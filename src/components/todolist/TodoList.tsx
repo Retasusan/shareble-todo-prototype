@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState } from "react";
 import styles from "./Todo.module.css";
 
@@ -8,16 +8,19 @@ export default function TodoList() {
         isDone: boolean;
         text: string;
         priority: string;
+        progress: number;
     }[]>([{
         id: "null",
         isDone: false,
         text: "サンプルタスク",
         priority: "普通",
+        progress: 0,
     }]);
     const [newTodo, setNewTodo] = useState<string>("");
     const [newPriority, setNewPriority] = useState<string>("普通");
     const [progressFilter, setProgressFilter] = useState<string>("全部");
-    const [priorityFilter, setPriorityFilter] = useState<string>("全部");
+    const [priorityFilter, setPriorityFilter] = useState<string>("非選択");
+    const [newProgress, setNewProgress] = useState<number>(0);
 
     const addTodoHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -28,9 +31,20 @@ export default function TodoList() {
             isDone: false,
             text: newTodo,
             priority: newPriority,
+            progress: newProgress,
+
         }]);
         setNewTodo("");
     }
+
+    const updateProgress = (id: string, newProgress: number) => {
+        const newTodos = [...todos];
+        const taskToUpdate = newTodos.find(todo => todo.id === id);
+        if (taskToUpdate) {
+            taskToUpdate.progress = newProgress;
+            setTodos(newTodos);
+        }
+    };
 
     useEffect(() => {
         const savedTodos = localStorage.getItem("todolist");
@@ -53,17 +67,18 @@ export default function TodoList() {
         localStorage.setItem("todolist", JSON.stringify(todos));
     }, [todos]);
 
-    const filteredTodos = todos.filter(todo => {
+
+    const filteredTodos = typeof todos.filter === 'function' && todos.filter(todo => {
         // 進捗状況の条件を満たすかどうか
         const progressCondition = progressFilter === '全部' || 
             (progressFilter === "完了" && todo.isDone) ||
             (progressFilter === "未完了" && !todo.isDone);
 
         // 優先度の条件を満たす
-        const priorityCondition = priorityFilter === '全部' || priorityFilter === todo.priority;
+        const priorityCondition = priorityFilter === '非選択' || priorityFilter === todo.priority;
 
         // 両方の条件を満たしているならリストに表示する
-        return progressCondition && priorityCondition;
+        return progressCondition && priorityCondition
     });
 
     return (
@@ -79,7 +94,7 @@ export default function TodoList() {
             </div>
             <div className={styles.border}>
                 <select className={styles.limit} id="limit" value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
-                    <option value="全部">全部</option>
+                    <option value="非選択">非選択</option>
                     <option value="至急">至急</option>
                     <option value="普通">普通</option>
                     <option value="些事">些事</option>
@@ -91,30 +106,37 @@ export default function TodoList() {
                 <button className={progressFilter ==='未完了' ? styles.selected : styles.button}onClick={() => setProgressFilter('未完了')}>未完了</button>
             </div>
             <ul className={styles.List}>
-                {filteredTodos.map((todo, index) => todo.id !== "null" ? (
+                {typeof filteredTodos.map === 'function' && filteredTodos.map((todo, index) => (
                     <li key={todo.id} className={todo.isDone ? styles.disabled : ''}>
                         <div>
                             <span>
-                                
                                 <input type="checkbox" checked={todo.isDone} onChange={e => {
-                                    // todosの中身を展開してnewTodosの中に格納している
                                     const newTodos = [...todos];
-                                    // newTodosの中からtodo.idに一致する最初の要素を引き出しclickTodoの中に格納している
                                     const clickedTodo = newTodos.find(x => x.id === todo.id);
-                                    // もしclickTodoが定義されていなかったらclickTodoのisDoneプロパティはeのdomのcheckedになる？
                                     if(clickedTodo !== undefined) clickedTodo.isDone = e.target.checked;
-                                    // Todosの中にnewTodosを格納する
                                     setTodos(newTodos);
                                 }} />
                             </span>
                             <span>{index + 1}.</span>
                             <span>{todo.priority}</span>
+                            
                             <span>{todo.text}</span>
+                            
+                        </div>
+                        
+                        <div className={styles.progressContainer}>
+                        <div className={styles.progressBar} style={{ width: `${todo.progress}%` }}></div>
+                        </div>
+                        <div>{todo.progress}%</div>
+                        <div>
+                        <button className={styles.increase} onClick={() => updateProgress(todo.id, Math.min(todo.progress +10, 100))}>+10%</button>
+                        <button className={styles.decrease} onClick={() => updateProgress(todo.id, Math.max(todo.progress -10, 0))}>-10%</button>
                         </div>
                         <div>
                             <button
                                 className={styles.RemoveButton}
                                 onClick={() => {
+                                    
                                     const newTodos = [...todos];
                                     newTodos.splice(index, 1);
                                     setTodos(newTodos);
@@ -127,7 +149,7 @@ export default function TodoList() {
                             </button>
                         </div>
                     </li>
-                ) : null)}
+                ))}
             </ul>
         </div>
     );

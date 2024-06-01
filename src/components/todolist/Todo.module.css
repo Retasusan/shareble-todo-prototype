@@ -94,3 +94,27 @@
     background-color: purple;
     color:white;
 }
+
+.progressContainer {
+    margin:0 20px 0 auto;
+    width: 20%;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progressBar {
+    height: 10px;
+    background-color: #76c7c0;
+    border-radius: 10px 0 10px;
+    transition: width 0.3s ease-in-out;
+}
+
+.increase{
+    background-color: green;
+}
+
+.decrease{
+    background-color:red;
+}

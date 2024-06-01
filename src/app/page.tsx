@@ -1,4 +1,5 @@
-import TodoList from "@/components/todolist";
+'use client';
+import TodoList from "@/components/todolist/TodoList";
 import styles from "@/styles/Top.module.css";
 
 export default function Home() {
